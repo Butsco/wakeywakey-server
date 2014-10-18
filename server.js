@@ -88,7 +88,7 @@ function postAlarm(req, res){
     });
 
     var newDate = new Date();
-    newDate.setTime(timestamp);
+    newDate.setTime(parseInt(req.body.timestamp) * 1000);
     var formattedDate = newDate.toUTCString();
 
     var message = fromName + " want's you to wake him/her up at " + formattedDate;
