@@ -1,0 +1,19 @@
+{
+    "name" : "wakeywakey",
+    "version" : "0.1.0",
+    "description" : "Wakey wakey",
+    "homepage": "http://wakeywakey.dance",
+    "author" : "lukin0110",
+    "dependencies" : {
+        "underscore": "1.6.0",
+        "mustache": "0.8.2",
+        "express": "4.8.0",
+        "request": "2.40.0",
+        "body-parser": "1.6.0",
+        "aws-sdk": "2.0.11",
+        "twilio": "1.7.0"
+    },
+    "engines" : {
+        "node":"0.10.26"
+    }
+}
