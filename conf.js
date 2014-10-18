@@ -3,9 +3,8 @@ SID: PN3095d7bb628912300f7dfc7d43048548
 Number: +19073122029
 Capabilities: Voice, SMS, MMS
  */
-
 var config = {
-    foo: 'bar',
+    rootUrl: 'https://wakeywakey.localtunnel.me',
 
     testers: {
         maarten: '+32470876752',
@@ -25,4 +24,10 @@ var config = {
     }
 };
 
+// If process.env.PORT is set the app is deployed on ElasticBeanstalk
+if(process.env.PORT){
+    config.rootUrl = 'http://wakey-env.elasticbeanstalk.com '
+}
+
+console.log("Config: " + process.env.PORT);
 exports.config = config;

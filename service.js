@@ -40,14 +40,17 @@ function sendSMS(to, message){
 /**
  * Alarm: {timestamp: timestamp, from: from, fromName: fromName, to: to, mood: mood }
  */
-function setupCall(alarm){
+function setupCall(msisdnFrom, msisdnTo){
     var wakeyFrom = config.twilio.from;
+    var from = msisdnFrom.replace('+', '%2B');
+    var initiateUrl = config.rootUrl + "/v1/scripts/initiate.xml?access_token=wham&from=" + from;
+    console.log("Initiate url " + initiateUrl);
 
     client.calls.create({
-        url: "https://wakeywakey.localtunnel.me/twilioscripts/juicy.xml",
+        //url: "https://wakeywakey.localtunnel.me/twilioscripts/juicy.xml",
         //url: "http://wakeywakey.dance/twilioscripts/initiate.xml",
-        //url: "https://wakeywakey.localtunnel.me/v1/scripts/initiate.xml",
-        to: config.testers.maarten,
+        url: initiateUrl,
+        to: msisdnTo,
         from: wakeyFrom,
         method: 'GET'
     }, function(err, call) {

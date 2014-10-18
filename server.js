@@ -1,6 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var conf = require('./conf.js').conf;
+var config = require('./conf.js').config;
 var service = require('./service.js').service;
 var data = require('./data.js').data;
 var schedule = require('node-schedule');
@@ -104,36 +104,25 @@ function postAlarm(req, res){
  * @param res
  * @param req
  */
-function script(res, req){
-    console.log("Script requested");
+function script(req, res){
+    var from = req.query["from"];
+    console.log("Script requested: " + from);
 
     var xml = '<?xml version="1.0" encoding="UTF-8"?>' +
         '<Response>' +
         '<Say voice="alice">Bert want\'s you to wake him up now, we\'ll start calling him now</Say>' +
-        '<Dial record="true"><Number>+32474418798</Number></Dial>' +
-        '<Say voice="alice">Thanks bro</Say>' +
+        '<Dial record="true"><Number>' + from + '</Number></Dial>' +
         '</Response>';
 
     res.setHeader("Content-Type", "text/xml");
     res.send(xml);
 }
 
-// Configure URLS
-app.get('/', index);
-app.get('/v1/alarms/', authenticate, getAlarms);
-app.post('/v1/alarms/', authenticate, postAlarm);
-app.post('/v1/scripts/initiate.xml', script);
-
-// Setup server
-var server = app.listen(process.env.PORT || 8000, function(){
-    console.log('Wake me up before you go go!');
-    console.log("Started at " + new Date().toUTCString() + "\n");
-});
-
 /**
- * Start scheduler and execute the job every 30 seconds
+ * Fetches the un-executed alarms from Parse and will execute the ones that are scheduled at the moment that this job is
+ * executed. It will setup the call between the bro's.
  */
-var job = function(){
+function job(){
     var date = new Date();
     var timestampNow = date.getTime()/1000; // Timestamp in seconds
     console.log("Job started at " + date.toUTCString());
@@ -150,7 +139,7 @@ var job = function(){
             // 2 minutes drift
             if(diff > -60 && diff < 60){
                 console.log("Execute Alarm: " + alarm.id);
-                // TODO: setup call for an alarm
+                service.setupCall(alarm.get('from'), alarm.get('to'));   // Initiate call
                 alarm.set('status', 'executed');
                 alarm.save();
             } else if(diff < -60) {
@@ -165,8 +154,23 @@ var job = function(){
         date = new Date();
         console.log("Job executed at " + date.toUTCString() + "\n");
     });
-};
+}
 
+// Configure URLS
+app.get('/', index);
+app.get('/v1/alarms/', authenticate, getAlarms);
+app.post('/v1/alarms/', authenticate, postAlarm);
+app.get('/v1/scripts/initiate.xml', authenticate, script);
+
+// Setup server
+var server = app.listen(process.env.PORT || 8000, function(){
+    console.log('Wake me up before you go go!');
+    console.log("Started at " + new Date().toUTCString() + "\n");
+});
+
+/**
+ * Start scheduler and execute the job every minute
+ */
 var rule1 = new schedule.RecurrenceRule();
 rule1.second = 0;
 schedule.scheduleJob(rule1, job);
@@ -175,14 +179,5 @@ schedule.scheduleJob(rule1, job);
 //rule2.second = 30;
 //schedule.scheduleJob(rule2, job);
 
-
-
 //service.sendSMS('+32470876752', 'bam chinees jongeuh');       // Maarten
 //service.sendSMS('+32474418798', 'bam chinees jongeuh');       // Bert
-
-//setTimeout(function(){
-//    console.log("setup call");
-//    service.setupCall();
-//}, 2000);
-
-//service.setupCall();
