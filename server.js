@@ -2,15 +2,14 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var conf = require('./conf.js').conf;
 var service = require('./service.js').service;
+var data = require('./data.js').data;
+var schedule = require('node-schedule');
 var app = express();
 
 // Configure the app
 app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded()); // to support URL-encoded bodies
 app.use(express.static(__dirname + '/static'));
-
-// Alarms stored in memory for now
-var alarms = [];
 
 /**
  *
@@ -41,17 +40,18 @@ function index(req, res){
 }
 
 function getAlarms(req, res){
-    var items = alarms;
 
-    res.send({
-        count: items.length,
-        items: items
+    data.toExecute(function(results){
+        res.send({
+            count: results.length,
+            items: results
+        });
     });
 }
 
 /**
  * Receiving the following parameters:
- *  - timestamp: int timestamp
+ *  - timestamp: int timestamp in seconds
  *  - from msisdn
  *  - to msisdn
  *  - mood: type of wake up call that you would like to receive
@@ -72,13 +72,14 @@ function postAlarm(req, res){
         return msisdn;
     }
 
-    var timestamp = req.body.timestamp;
+    // This looks a bit weird but this is to avoid decimals and Parse only accepts a string for this value
+    var timestamp = parseInt(req.body.timestamp).toString();
     var from = format(req.body.from);
     var fromName = req.body.fromName;
     var to = format(req.body.to);
     var mood = req.body.mood;
 
-    alarms.push({
+    data.storeAlarm({
         timestamp: timestamp,
         from: from,
         fromName: fromName,
@@ -87,7 +88,7 @@ function postAlarm(req, res){
     });
 
     var newDate = new Date();
-    newDate.setTime(timestamp * 1000);
+    newDate.setTime(timestamp);
     var formattedDate = newDate.toUTCString();
 
     var message = fromName + " want's you to wake him/her up at " + formattedDate;
@@ -117,21 +118,71 @@ function script(res, req){
     res.send(xml);
 }
 
+// Configure URLS
 app.get('/', index);
 app.get('/v1/alarms/', authenticate, getAlarms);
 app.post('/v1/alarms/', authenticate, postAlarm);
 app.post('/v1/scripts/initiate.xml', script);
 
+// Setup server
 var server = app.listen(process.env.PORT || 8000, function(){
     console.log('Wake me up before you go go!');
+    console.log("Started at " + new Date().toUTCString() + "\n");
 });
 
-//service.sendSMS('+32470876752', 'bam chiness jongeuh');       // Maarten
-//service.sendSMS('+32474418798', 'bam chiness jongeuh');       // Bert
+/**
+ * Start scheduler and execute the job every 30 seconds
+ */
+var job = function(){
+    var date = new Date();
+    var timestampNow = date.getTime()/1000; // Timestamp in seconds
+    console.log("Job started at " + date.toUTCString());
 
-setTimeout(function(){
-    console.log("setup call");
-    service.setupCall();
-}, 2000);
+    data.toExecute(function(results){
+        console.log("Items to execute: " + results.length);
+
+        for(var i=0; i<results.length; i++){
+            var alarm = results[i];
+            var timestampAlarm = alarm.get('timestamp');
+            var diff = timestampAlarm - timestampNow;
+            console.log("Diff: " + diff);
+
+            // 2 minutes drift
+            if(diff > -60 && diff < 60){
+                console.log("Execute Alarm: " + alarm.id);
+                // TODO: setup call for an alarm
+                alarm.set('status', 'executed');
+                alarm.save();
+            } else if(diff < -60) {
+                console.log("Alarm to old: " + alarm.id);
+                alarm.set('status', 'toOld');
+                alarm.save();
+            } else {
+                console.log("Hmmm: " + alarm.id);
+            }
+        }
+
+        date = new Date();
+        console.log("Job executed at " + date.toUTCString() + "\n");
+    });
+};
+
+var rule1 = new schedule.RecurrenceRule();
+rule1.second = 0;
+schedule.scheduleJob(rule1, job);
+
+//var rule2 = new schedule.RecurrenceRule();
+//rule2.second = 30;
+//schedule.scheduleJob(rule2, job);
+
+
+
+//service.sendSMS('+32470876752', 'bam chinees jongeuh');       // Maarten
+//service.sendSMS('+32474418798', 'bam chinees jongeuh');       // Bert
+
+//setTimeout(function(){
+//    console.log("setup call");
+//    service.setupCall();
+//}, 2000);
 
 //service.setupCall();
