@@ -7,6 +7,9 @@ var app = express();
 app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded()); // to support URL-encoded bodies
 
+// Alarms stored in memory for now
+var alarms = [];
+
 /**
  *
  * @param req
@@ -36,13 +39,42 @@ function index(req, res){
 }
 
 function getAlarms(req, res){
+    var items = alarms;
+
     res.send({
-        items: []
+        count: items.length,
+        items: items
     });
 }
 
+/**
+ * Receiving the following parameters:
+ *  - timestamp: int timestamp
+ *  - from msisdn
+ *  - to msisdn
+ *  - mood: type of wake up call that you would like to receive
+ *    - happy, scary, singing, etc
+ *
+ * curl http://localhost:8000/v1/alarms/?access_token=wham --data "timestamp=234234&from=32474418798&to=32470876752&mood=singing"
+ * curl http://localhost:8000/v1/alarms/?access_token=wham
+ *
+ * @param req
+ * @param res
+ */
 function postAlarm(req, res){
-    res.send({detail: 'thanks sleepy head'});
+    var timestamp = req.body.timestamp;
+    var from = req.body.from;
+    var to = req.body.to;
+    var mood = req.body.mood;
+
+    alarms.push({
+        timestamp: timestamp,
+        from: from,
+        to: to,
+        mood: mood
+    });
+
+    res.send({detail: 'Alarm set sleepy head!'});
 }
 
 app.get('/', index);
