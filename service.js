@@ -5,7 +5,7 @@ var client = new twilio.RestClient(config.twilio.sid, config.twilio.secret);
 
 /**
  * https://www.twilio.com/blog/2013/03/introducing-the-twilio-module-for-node-js.html
- * 
+ *
  * @param to
  * @param message
  */
@@ -44,7 +44,8 @@ function setupCall(alarm){
     var wakeyFrom = config.twilio.from;
 
     client.calls.create({
-        url: "http://wakeywakey.dance/twilioscripts/initiate.xml",
+        url: "https://wakeywakey.localtunnel.me/twilioscripts/juicy.xml",
+        //url: "http://wakeywakey.dance/twilioscripts/initiate.xml",
         //url: "https://wakeywakey.localtunnel.me/v1/scripts/initiate.xml",
         to: config.testers.maarten,
         from: wakeyFrom,

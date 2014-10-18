@@ -7,6 +7,7 @@ var app = express();
 // Configure the app
 app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded()); // to support URL-encoded bodies
+app.use(express.static(__dirname + '/static'));
 
 // Alarms stored in memory for now
 var alarms = [];
@@ -127,4 +128,10 @@ var server = app.listen(process.env.PORT || 8000, function(){
 
 //service.sendSMS('+32470876752', 'bam chiness jongeuh');       // Maarten
 //service.sendSMS('+32474418798', 'bam chiness jongeuh');       // Bert
-service.setupCall();
+
+setTimeout(function(){
+    console.log("setup call");
+    service.setupCall();
+}, 2000);
+
+//service.setupCall();
