@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Post a new alarm";
-curl http://localhost:8000/v1/alarms/?access_token=wham --data "timestamp=234234&from=32474418798&to=32470876752&mood=singing"
+curl http://localhost:8000/v1/alarms/?access_token=wham --data "timestamp=1301090400&from=%2B32474418798&to=%2B32470876752&mood=singing&fromName=Bert Wijnants"
 
 echo "";
 echo "";
