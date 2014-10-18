@@ -38,3 +38,15 @@ Setup tunnel:
 $lt --port 8000 --subdomain=wakeywakey
 your url is: https://wakeywakey.localtunnel.me
 ```
+
+Elastic Beanstalk
+-----------------
+Add the 'eb' tool in your path:
+```
+export PATH="/var/lib/AWS-ElasticBeanstalk-CLI-2.6.3/eb/macosx/python2.7/:$PATH"
+```
+
+Config:
+```
+eb init
+```

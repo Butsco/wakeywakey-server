@@ -15,3 +15,4 @@ source/node_modules
 .idea
 
 
+.elasticbeanstalk/

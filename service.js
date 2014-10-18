@@ -54,7 +54,7 @@ function setupCall(msisdnFrom, msisdnTo){
         from: wakeyFrom,
         method: 'GET'
     }, function(err, call) {
-        process.stdout.write(call.sid);
+        //process.stdout.write(call.sid);
 
         if(!err){
             console.log("\nCall started: " + call.sid);

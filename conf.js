@@ -26,7 +26,7 @@ var config = {
 
 // If process.env.PORT is set the app is deployed on ElasticBeanstalk
 if(process.env.PORT){
-    config.rootUrl = 'http://wakey-env.elasticbeanstalk.com '
+    config.rootUrl = 'http://wakey-env.elasticbeanstalk.com'
 }
 
 console.log("Config: " + process.env.PORT);
