@@ -162,6 +162,14 @@ app.get('/', index);
 app.get('/v1/alarms/', authenticate, getAlarms);
 app.post('/v1/alarms/', authenticate, postAlarm);
 app.get('/v1/scripts/initiate.xml', authenticate, script);
+app.get('/v1/nexmocallback/', function(req, res){
+    //https://rest.nexmo.com/ni/json?api_key=1b7171f6&api_secret=2313a132&number=32470876752&features=carrier,roaming,reachable,ported&callback=https://wakeywakey.localtunnel.me/v1/nexmocallback/
+    //https://rest.nexmo.com/ni/json?api_key=1b7171f6&api_secret=2313a132&number=32470876752&features=type,valid,subscriber,carrier,roaming,reachable,ported&callback=https://wakeywakey.localtunnel.me/v1/nexmocallback/
+    //https://rest.nexmo.com/ni/json?api_key=1b7171f6&api_secret=2313a132&number=32476744989&features=type,valid,subscriber,carrier,roaming,reachable,ported&callback=https://wakeywakey.localtunnel.me/v1/nexmocallback/
+    console.log('Bam jong: ');
+    console.log(req.query);
+    res.send({detail: "test"});
+});
 
 // Setup server
 var server = app.listen(process.env.PORT || 8000, function(){
