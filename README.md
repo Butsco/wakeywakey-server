@@ -50,3 +50,5 @@ Config:
 ```
 eb init
 ```
+
+Deployed on http://wakey-env.elasticbeanstalk.com/
