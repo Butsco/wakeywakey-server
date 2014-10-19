@@ -106,11 +106,12 @@ function postAlarm(req, res){
  */
 function script(req, res){
     var from = req.query["from"];
+    var fromName = req.query['fromName'];
     console.log("Script requested: " + from);
 
     var xml = '<?xml version="1.0" encoding="UTF-8"?>' +
         '<Response>' +
-        '<Say voice="alice">Bert want\'s you to wake him up now, we\'ll start calling him now</Say>' +
+        '<Say voice="alice">' + fromName + ' want\'s you to wake him up now, we\'ll start calling him</Say>' +
         '<Dial record="true"><Number>' + from + '</Number></Dial>' +
         '</Response>';
 
@@ -139,7 +140,7 @@ function job(){
             // 2 minutes drift
             if(diff > -60 && diff < 60){
                 console.log("Execute Alarm: " + alarm.id);
-                service.setupCall(alarm.get('from'), alarm.get('to'));   // Initiate call
+                service.setupCall(alarm.get('from'), alarm.get('fromName'), alarm.get('to'));   // Initiate call
                 alarm.set('status', 'executed');
                 alarm.save();
             } else if(diff < -60) {

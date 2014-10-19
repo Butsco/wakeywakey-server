@@ -40,10 +40,10 @@ function sendSMS(to, message){
 /**
  * Alarm: {timestamp: timestamp, from: from, fromName: fromName, to: to, mood: mood }
  */
-function setupCall(msisdnFrom, msisdnTo){
+function setupCall(msisdnFrom, fromName, msisdnTo){
     var wakeyFrom = config.twilio.from;
     var from = msisdnFrom.replace('+', '%2B');
-    var initiateUrl = config.rootUrl + "/v1/scripts/initiate.xml?access_token=wham&from=" + from;
+    var initiateUrl = config.rootUrl + "/v1/scripts/initiate.xml?access_token=wham&from=" + from + "&fromName=" + fromName;
     console.log("Initiate url " + initiateUrl);
 
     client.calls.create({
